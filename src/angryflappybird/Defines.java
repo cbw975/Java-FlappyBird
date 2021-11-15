@@ -14,9 +14,9 @@ public class Defines {
     
 	// dimension of the GUI application
     final int APP_HEIGHT = 600;
-    final int APP_WIDTH = 600;
-    final int SCENE_HEIGHT = 570;
-    final int SCENE_WIDTH = 400;
+    final int APP_WIDTH = 800;
+    final static int SCENE_HEIGHT = 570;
+    final static int SCENE_WIDTH = 600;
 
     // coefficients related to the blob
     final int BLOB_WIDTH = 70;
@@ -30,7 +30,7 @@ public class Defines {
     final int BLOB_IMG_PERIOD = 5;
     
     // coefficients related to the floors
-    final int FLOOR_WIDTH = 400;
+    final int FLOOR_WIDTH = 600;
     final int FLOOR_HEIGHT = 100;
     final int FLOOR_COUNT = 2;
     

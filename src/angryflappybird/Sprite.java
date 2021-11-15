@@ -35,6 +35,10 @@ public class Sprite {
         this.height = image.getHeight();
     }
 
+    public void setImageSize(String path, double width, double height){
+        setImage(new Image(path,width,height,false,false));
+    }
+
     public void setPositionXY(double positionX, double positionY) {
         this.positionX = positionX;
         this.positionY = positionY;
