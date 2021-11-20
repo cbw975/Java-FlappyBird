@@ -13,10 +13,10 @@ public class Pipe {
         String imgPath;
         this.height = height;
         if(isBottom){
-            imgPath = "../resources/images/bottomPipe.png";
-            this.positionY = Defines.SCENE_WIDTH - height;
+            imgPath = getClass().getResource("../resources/images/bottomPipe.png").toExternalForm();
+            this.positionY = Defines.SCENE_HEIGHT - height;
         }else{
-            imgPath = "../resources/images/topPipe.png";
+            imgPath = getClass().getResource("../resources/images/topPipe.png").toExternalForm();
             this.positionY = 0;
         }
         this.pipe.setImageSize(imgPath, width, height);

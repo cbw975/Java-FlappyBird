@@ -11,7 +11,6 @@ public class Bird {
     private int numFrames = 4;
     private int indFrame = 0;  // current frame of flight animation
     private double positionX, positionY;
-    private double BIRD_WIDTH, BIRD_HEIGHT;
     private String[] BIRD_IMAGES = {"../resources/images/bird0","../resources/images/bird1","../resources/images/bird0","../resources/images/bird2"};
 
     public Bird(){
@@ -25,7 +24,7 @@ public class Bird {
     private void setBirdFrames(){
         for(int i=0; i<numFrames; i++){
             Sprite b = new Sprite();
-            b.setImageSize(BIRD_IMAGES[i],BIRD_WIDTH,BIRD_HEIGHT);
+            b.setImageSize(BIRD_IMAGES[i],Defines.BLOB_WIDTH,Defines.BLOB_HEIGHT);
             b.setPositionXY(positionX, positionY);
             frames.add(b);
         }
