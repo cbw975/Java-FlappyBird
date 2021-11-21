@@ -47,7 +47,7 @@ public class Defines {
     final int PIPE_HEIGHT_DO_SPACING = 350; // 425;  // larger value makes harder (smaller space b/w pipes)
     final int PIPE_MAX_HEIGHT = 325; // 400;
     final int PIPE_MIN_HEIGHT = 25;
-    final double PIPE_SCROLL_VEL = -0.35;
+    final double PIPE_SCROLL_VEL = -0.4;  // NOTE: set to be multiple of -0.2
     
     // coefficients related to time
     final int SCENE_SHIFT_TIME = 5;

@@ -124,6 +124,8 @@ public class AngryFlappyBird extends Application {
 			scoreLabel.setFont(Font.font("Verdana", FontWeight.EXTRA_BOLD, 50));
 			scoreLabel.setStroke(Color.BLACK);
 			scoreLabel.setFill(Color.WHITE);
+			totalScore = 0;
+			updateScoreText(0);
 			lives = 3;
 			livesLabel = new Text(10, 50, "3 lives left");
 			livesLabel.setFont(Font.font("Verdana", FontWeight.EXTRA_BOLD, 25));
@@ -140,8 +142,6 @@ public class AngryFlappyBird extends Application {
         GAME_OVER = false;
         GAME_START = false;
 		OBSTACLE_COLLISION = false;
-		totalScore = 0;
-		updateScoreText(0);
         floors = new ArrayList<>();
 		pipes = new ArrayList<>();
     	
@@ -214,7 +214,6 @@ public class AngryFlappyBird extends Application {
             for (Pipe pipe : pipes) {
                 if (pipe.getPipe().getPositionX() == blob.getPositionX()) {
                     updateScoreText(++totalScore);  // increment score
-					System.out.println(totalScore);
 					// TODO: play audio!
                     break;
                 }
