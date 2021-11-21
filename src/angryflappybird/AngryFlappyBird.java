@@ -39,6 +39,7 @@ public class AngryFlappyBird extends Application {
 	private Text scoreLabel;  // displayed score
 	private Text livesLabel;  // displayed life count
 	private int totalScore = 0;  // score
+	private int lives = 3;  // lives remaining
 	// private Bird bird;
     private Sprite blob;
     private ArrayList<Sprite> floors;
@@ -92,40 +93,24 @@ public class AngryFlappyBird extends Application {
     private void mouseClickHandler(MouseEvent e) {
 		if(!OBSTACLE_COLLISION) {  // if not (already) colliding with obstacle
 			CLICKED = true;  // register click
+			// TODO: Audio clip of wing flap
 			if(GAME_START) {  // Game in progress
-				// TODO: Audio clip of wing flap
 				clickTime = System.nanoTime(); 
-				blob.setVelocity(0, DEF.BLOB_FLY_VEL);  // TODO: maybe change to be higher?
-			}
-			else {  // Start game if not yet started
-				// TODO: Add starting screen?
-				// TODO: Audio clip of wing flap - maybe different from others?
+				blob.setVelocity(0, DEF.BLOB_FLY_VEL);
+			} else {  // Start game if not yet started
 				GAME_START = true;
 			}
-		} else {
-			// TODO: decrement life count
-			// check for gameOver --> life count 0 (or pig collision)
-			resetGameScene(false);  // TODO: modify for life count ????
+		} else {  // collision occured --> lose a life (restart playing if not gameover)
+			decLives();
 		}
 		
     	if (GAME_OVER) {  // restart game loop
-			resetGameControl();    // reset the gameControl
     		resetGameScene(true);  // reset the gameScene
         }
     }
     
     private void resetGameScene(boolean firstEntry) {
     	
-    	// reset variables
-        CLICKED = false;
-        GAME_OVER = false;
-        GAME_START = false;
-		OBSTACLE_COLLISION = false;
-		totalScore = 0;
-		// updateScoreText(totalScore);
-        floors = new ArrayList<>();
-		pipes = new ArrayList<>();
-        
     	if(firstEntry) {
     		// create two canvases
             Canvas canvas = new Canvas(DEF.SCENE_WIDTH, DEF.SCENE_HEIGHT);
@@ -139,6 +124,7 @@ public class AngryFlappyBird extends Application {
 			scoreLabel.setFont(Font.font("Verdana", FontWeight.EXTRA_BOLD, 50));
 			scoreLabel.setStroke(Color.BLACK);
 			scoreLabel.setFill(Color.WHITE);
+			lives = 3;
 			livesLabel = new Text(10, 50, "3 lives left");
 			livesLabel.setFont(Font.font("Verdana", FontWeight.EXTRA_BOLD, 25));
 
@@ -148,6 +134,16 @@ public class AngryFlappyBird extends Application {
             gameScene = new Group();
             gameScene.getChildren().addAll(background, canvas, scoreLabel, livesLabel);
     	}
+		
+    	// reset variables
+        CLICKED = false;
+        GAME_OVER = false;
+        GAME_START = false;
+		OBSTACLE_COLLISION = false;
+		totalScore = 0;
+		updateScoreText(0);
+        floors = new ArrayList<>();
+		pipes = new ArrayList<>();
     	
     	// initialize floor
     	for(int i=0; i<DEF.FLOOR_COUNT; i++) {
@@ -210,7 +206,6 @@ public class AngryFlappyBird extends Application {
     }
 
 	private void updateScoreText(int score) {
-		System.out.println(score);
         scoreLabel.setText(Integer.toString(score));
     }
 
@@ -219,6 +214,7 @@ public class AngryFlappyBird extends Application {
             for (Pipe pipe : pipes) {
                 if (pipe.getPipe().getPositionX() == blob.getPositionX()) {
                     updateScoreText(++totalScore);  // increment score
+					System.out.println(totalScore);
 					// TODO: play audio!
                     break;
                 }
@@ -226,6 +222,19 @@ public class AngryFlappyBird extends Application {
         }
 	}
 
+	// decrement life count, game over if reached 0 lives
+	private void decLives() {
+		if(lives <= 1){
+			livesLabel.setText("0 lives left");
+			GAME_OVER = true;
+		} else {
+			String lifeText = Integer.toString(--lives) + " lives left";
+			livesLabel.setText(lifeText);
+			timer.stop();
+			// begin playing again
+			resetGameScene(false);
+		}
+	}
 
     //timer stuff
     class MyTimer extends AnimationTimer {
@@ -240,6 +249,7 @@ public class AngryFlappyBird extends Application {
     	     
     	     // clear current scene
     	     gc.clearRect(0, 0, DEF.SCENE_WIDTH, DEF.SCENE_HEIGHT);
+			 // TODO: clear bird gc rectangle -> Bird rotation animation
 
 			 // step1: update floor
 			 moveFloor();
@@ -248,14 +258,11 @@ public class AngryFlappyBird extends Application {
 				 // Step1: update and render pipes
 				 movePipes();
 				 checkPipeScroll();
-				 updateScore();  // increment score if when pass pipes
-				 
-				 // TODO: ADD GAME LOGIC
+				 updateScore();  // increment score if pass pipes
 
     	    	 // step2: update blob
     	    	 moveBlob();
-    	    	 checkCollision();
-
+    	    	 checkCollision();  // handle any collision events
 				 
     	     }
     	 }
@@ -286,9 +293,7 @@ public class AngryFlappyBird extends Application {
 				imageIndex = Math.floorMod(imageIndex, DEF.BLOB_IMG_LEN);
 				blob.setImage(DEF.IMAGE.get("bird"+String.valueOf(imageIndex)));
 				blob.setVelocity(0, DEF.BLOB_FLY_VEL);
-			}
-			// blob drops after a period of time without button click
-			else {
+			} else {  // blob drops after a period of time without button click
 			    blob.setVelocity(0, DEF.BLOB_DROP_VEL); 
 			    CLICKED = false;
 			}
@@ -319,7 +324,7 @@ public class AngryFlappyBird extends Application {
 						// TODO: audio clip of collision
 
 						// Bird flapping wings
-						// Animation of Bird falling immediately upon collision
+						// TODO: Animation of Bird falling immediately upon collision
 						flapTime += 0.18;
                         if (flapTime > 0.5) {
                             blob.addVelocity(-200, DEF.BLOB_DROP_VEL);
@@ -327,25 +332,18 @@ public class AngryFlappyBird extends Application {
                             blob.update(elapsedTime);
                             flapTime = 0;
                         }
-						
-						
-						GAME_OVER = true;
+						decLives();  // lose life
 						break;
 					}
 				}
 			}
-			
-			// // check collision with floor
-			// for (Sprite floor: floors) {
-			// 	GAME_OVER = GAME_OVER || blob.intersectsSprite(floor);
-			// }
 
 			// check collision with floor
 			if(!OBSTACLE_COLLISION){
 				for(Sprite floor: floors) {
 					if(blob.intersectsSprite(floor)){
 						OBSTACLE_COLLISION = true;
-						// TODO: Collision animation + Bird falls backwards
+						// TODO: audio clip of collision
 						GAME_OVER = true;
 						break;
 					}
@@ -357,6 +355,9 @@ public class AngryFlappyBird extends Application {
 			// end the game when blob hit stuff
 			if (GAME_OVER) {
 				showHitEffect();
+				lives = 0;
+				decLives();  // update display
+				updateScoreText(0);
 				for (Sprite floor: floors) {
 					floor.setVelocity(0, 0);
 				}
