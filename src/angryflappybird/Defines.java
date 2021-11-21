@@ -19,13 +19,13 @@ public class Defines {
     final static int SCENE_WIDTH = 400;
 
     // coefficients related to the blob
-    final static int BLOB_WIDTH = 70;
-    final static int BLOB_HEIGHT = 70;
+    final static int BLOB_WIDTH = 50;
+    final static int BLOB_HEIGHT = 50;
     final int BLOB_POS_X = 70;
     final int BLOB_POS_Y = 200;
     final int BLOB_DROP_TIME = 300000000;  	// the elapsed time threshold before the blob starts dropping
     final int BLOB_DROP_VEL = 300;    		// the blob drop velocity
-    final int BLOB_FLY_VEL = -40;
+    final int BLOB_FLY_VEL = -150;  // originally -40
     final int BLOB_IMG_LEN = 4;
     final int BLOB_IMG_PERIOD = 5;
 
@@ -44,10 +44,10 @@ public class Defines {
     final int FLOOR_COUNT = 2;
 
     // coefficients related to a pipe
-    final int PIPE_HEIGHT_DO_SPACING = 425;
-    final int PIPE_MAX_HEIGHT = 400;
+    final int PIPE_HEIGHT_DO_SPACING = 350; // 425;  // larger value makes harder (smaller space b/w pipes)
+    final int PIPE_MAX_HEIGHT = 325; // 400;
     final int PIPE_MIN_HEIGHT = 25;
-    final double PIPE_SCROLL_VEL = -0.5;
+    final double PIPE_SCROLL_VEL = -0.35;
     
     // coefficients related to time
     final int SCENE_SHIFT_TIME = 5;
@@ -60,7 +60,7 @@ public class Defines {
     // coefficients related to media display
     final String STAGE_TITLE = "Angry Flappy Bird";
 	private final String IMAGE_DIR = "../resources/images/";
-    final String[] IMAGE_FILES = {"background","blob0","blob1","blob2","blob3","floor","pig","whiteEgg"};
+    final String[] IMAGE_FILES = {"background","bird0","bird1","bird2","bird3","floor","pig","whiteEgg"};
 
     final HashMap<String, ImageView> IMVIEW = new HashMap<String, ImageView>();
     final HashMap<String, Image> IMAGE = new HashMap<String, Image>();

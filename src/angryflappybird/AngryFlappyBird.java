@@ -32,13 +32,14 @@ public class AngryFlappyBird extends Application {
 	private Defines DEF = new Defines();
     
     // time related attributes
-    private long clickTime, startTime, elapsedTime;   
+    private long clickTime, startTime, flapTime, elapsedTime;   
     private AnimationTimer timer;
     
     // game components
 	private Text scoreLabel;  // displayed score
 	private Text livesLabel;  // displayed life count
 	private int totalScore = 0;  // score
+	// private Bird bird;
     private Sprite blob;
     private ArrayList<Sprite> floors;
 	private ArrayList<Pipe> pipes;
@@ -89,15 +90,28 @@ public class AngryFlappyBird extends Application {
     }
     
     private void mouseClickHandler(MouseEvent e) {
-    	if (GAME_OVER) {
-            resetGameScene(false);
+		if(!OBSTACLE_COLLISION) {  // if not (already) colliding with obstacle
+			CLICKED = true;  // register click
+			if(GAME_START) {  // Game in progress
+				// TODO: Audio clip of wing flap
+				clickTime = System.nanoTime(); 
+				blob.setVelocity(0, DEF.BLOB_FLY_VEL);  // TODO: maybe change to be higher?
+			}
+			else {  // Start game if not yet started
+				// TODO: Add starting screen?
+				// TODO: Audio clip of wing flap - maybe different from others?
+				GAME_START = true;
+			}
+		} else {
+			// TODO: decrement life count
+			// check for gameOver --> life count 0 (or pig collision)
+			resetGameScene(false);  // TODO: modify for life count ????
+		}
+		
+    	if (GAME_OVER) {  // restart game loop
+			resetGameControl();    // reset the gameControl
+    		resetGameScene(true);  // reset the gameScene
         }
-    	else if (GAME_START){
-			// TODO: audio clip of wing flap
-            clickTime = System.nanoTime();   
-        }
-    	GAME_START = true;
-        CLICKED = true;
     }
     
     private void resetGameScene(boolean firstEntry) {
@@ -106,6 +120,9 @@ public class AngryFlappyBird extends Application {
         CLICKED = false;
         GAME_OVER = false;
         GAME_START = false;
+		OBSTACLE_COLLISION = false;
+		totalScore = 0;
+		// updateScoreText(totalScore);
         floors = new ArrayList<>();
 		pipes = new ArrayList<>();
         
@@ -146,7 +163,9 @@ public class AngryFlappyBird extends Application {
     	}
         
         // initialize blob
-        blob = new Sprite(DEF.BLOB_POS_X, DEF.BLOB_POS_Y, DEF.IMAGE.get("blob0"));
+        blob = new Sprite(DEF.BLOB_POS_X, DEF.BLOB_POS_Y, DEF.IMAGE.get("bird0"));
+		// bird = new Bird();
+		// blob = bird.getBird();
         blob.render(gc);
 
 		// initialize pipes
@@ -191,6 +210,7 @@ public class AngryFlappyBird extends Application {
     }
 
 	private void updateScoreText(int score) {
+		System.out.println(score);
         scoreLabel.setText(Integer.toString(score));
     }
 
@@ -235,6 +255,8 @@ public class AngryFlappyBird extends Application {
     	    	 // step2: update blob
     	    	 moveBlob();
     	    	 checkCollision();
+
+				 
     	     }
     	 }
     	 
@@ -262,7 +284,7 @@ public class AngryFlappyBird extends Application {
 				
 				int imageIndex = Math.floorDiv(counter++, DEF.BLOB_IMG_PERIOD);
 				imageIndex = Math.floorMod(imageIndex, DEF.BLOB_IMG_LEN);
-				blob.setImage(DEF.IMAGE.get("blob"+String.valueOf(imageIndex)));
+				blob.setImage(DEF.IMAGE.get("bird"+String.valueOf(imageIndex)));
 				blob.setVelocity(0, DEF.BLOB_FLY_VEL);
 			}
 			// blob drops after a period of time without button click
@@ -286,8 +308,34 @@ public class AngryFlappyBird extends Application {
 		}
     	 
     	 public void checkCollision() {
-    		 
-    		// // check collision with floor
+
+			// check collision with pipes
+			if(!OBSTACLE_COLLISION) {  // if not already in collision
+				for(Pipe p: pipes) {
+					if(blob.intersectsSprite(p.getPipe())) {
+						OBSTACLE_COLLISION = true;
+						showHitEffect();  // collision animation
+						endScroll();
+						// TODO: audio clip of collision
+
+						// Bird flapping wings
+						// Animation of Bird falling immediately upon collision
+						flapTime += 0.18;
+                        if (flapTime > 0.5) {
+                            blob.addVelocity(-200, DEF.BLOB_DROP_VEL);
+                            blob.render(gc);
+                            blob.update(elapsedTime);
+                            flapTime = 0;
+                        }
+						
+						
+						GAME_OVER = true;
+						break;
+					}
+				}
+			}
+			
+			// // check collision with floor
 			// for (Sprite floor: floors) {
 			// 	GAME_OVER = GAME_OVER || blob.intersectsSprite(floor);
 			// }
@@ -296,18 +344,6 @@ public class AngryFlappyBird extends Application {
 			if(!OBSTACLE_COLLISION){
 				for(Sprite floor: floors) {
 					if(blob.intersectsSprite(floor)){
-						OBSTACLE_COLLISION = true;
-						// TODO: Collision animation + Bird falls backwards
-						GAME_OVER = true;
-						break;
-					}
-				}
-			}
-
-			// check collision with pipes
-			if(!OBSTACLE_COLLISION) {  // if not already in collision
-				for(Pipe p: pipes) {
-					if(blob.intersectsSprite(p.getPipe())) {
 						OBSTACLE_COLLISION = true;
 						// TODO: Collision animation + Bird falls backwards
 						GAME_OVER = true;
@@ -328,6 +364,15 @@ public class AngryFlappyBird extends Application {
 			}
 			
     	 }
+
+		 private void endScroll() {
+			for (Pipe p: pipes) {
+				p.getPipe().setVelocity(0, 0);
+			}
+			for (Sprite f: floors) {
+				f.setVelocity(0, 0);
+			}
+		 }
     	 
 	     private void showHitEffect() {
 	        ParallelTransition parallelTransition = new ParallelTransition();
