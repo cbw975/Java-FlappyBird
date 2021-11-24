@@ -30,13 +30,19 @@ public class Defines {
     final int BLOB_IMG_PERIOD = 5;
 
     // coefficients related to a pig
-    final int PIG_WIDTH = 80;
-    final int PIG_HEIGHT = 80;
+    final int PIG_POS_X = 400;              // same as positionX of Pipe
+    final int PIG_WIDTH = 60;
+    final int PIG_HEIGHT = 50;
     final int PIG_DROP_VEL = 100;    		// the pig drop velocity
+    final double PIG_PROB = 1.0;            // probability that a pig will spawn under pipe
 
     // coefficients related to an egg
-    final int EGG_WIDTH = 60;
+    final int EGG_POS_X = 400;              // same as positionX of Pipe
+    final int EGG_WIDTH = 60;               // same as width of Pipe
     final int EGG_HEIGHT = 70;
+    final double EGG_PROB = 1.0;            // probability that an egg will spawn on a pipe
+    final int EGG_POINTS = 5;               // points gained from collecting a (white) egg
+    // final double EGG_GOLD_PROB = 0.25;      // probability that a spawned egg will be gold
     
     // coefficients related to a floor
     final int FLOOR_WIDTH = 600;

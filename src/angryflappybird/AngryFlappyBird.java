@@ -42,6 +42,7 @@ public class AngryFlappyBird extends Application {
 	private int lives = 3;  // lives remaining
 	// private Bird bird;
     private Sprite blob;
+	private Sprite eggSprite, pigSprite;
     private ArrayList<Sprite> floors;
 	private ArrayList<Pipe> pipes;
     
@@ -175,6 +176,25 @@ public class AngryFlappyBird extends Application {
         timer.start();
     }
 
+	// Egg stuff
+	private void setEgg(int pipeHeight) {
+		if(Math.random() < DEF.EGG_PROB){  // Check if egg spawns
+			eggSprite = new Sprite(DEF.EGG_POS_X,DEF.SCENE_HEIGHT - pipeHeight - DEF.EGG_HEIGHT, DEF.IMAGE.get("whiteEgg"));
+			eggSprite.setVelocity(DEF.PIPE_SCROLL_VEL, 0);
+        	eggSprite.render(gc);
+		}
+	}
+
+	// Pig stuff
+	private void setPig(int pipeHeight) {
+		if(Math.random() < DEF.PIG_PROB){  // Check if egg spawns
+			System.out.println("entered setPig(). Setting pig");
+			pigSprite = new Sprite(DEF.PIG_POS_X,DEF.PIPE_HEIGHT_DO_SPACING - pipeHeight + DEF.PIG_HEIGHT, DEF.IMAGE.get("pig"));
+			pigSprite.setVelocity(DEF.PIPE_SCROLL_VEL, DEF.PIG_DROP_VEL);
+        	pigSprite.render(gc);
+		}
+	}
+
 	// Pipe stuff
 	private int getRandomPipeHeight() {
         return (int) (Math.random() * (DEF.PIPE_MAX_HEIGHT - DEF.PIPE_MIN_HEIGHT)) + DEF.PIPE_MIN_HEIGHT;
@@ -189,6 +209,8 @@ public class AngryFlappyBird extends Application {
         topPipe.getPipe().setVelocity(DEF.PIPE_SCROLL_VEL, 0);
 
         botPipe.getPipe().render(gc);
+		setEgg(height);
+		setPig(height);
         topPipe.getPipe().render(gc);
 
         pipes.add(botPipe);
@@ -203,6 +225,8 @@ public class AngryFlappyBird extends Application {
             } else if (p.getPositionX() <= -p.getWidth()) {
                 pipes.remove(0);
                 pipes.remove(0);
+				eggSprite = null;
+				pigSprite = null;
             }
         }
     }
@@ -242,29 +266,30 @@ public class AngryFlappyBird extends Application {
     	
     	int counter = 0;
     	
-    	 @Override
-    	 public void handle(long now) {   		 
-    		 // time keeping
-    	     elapsedTime = now - startTime;
-    	     startTime = now;
+    	@Override
+    	public void handle(long now) {   		 
+    		// time keeping
+    	    elapsedTime = now - startTime;
+    	    startTime = now;
     	     
-    	     // clear current scene
-    	     gc.clearRect(0, 0, DEF.SCENE_WIDTH, DEF.SCENE_HEIGHT);
-			 // TODO: clear bird gc rectangle -> Bird rotation animation
+    	    // clear current scene
+    	    gc.clearRect(0, 0, DEF.SCENE_WIDTH, DEF.SCENE_HEIGHT);
+			// TODO: clear bird gc rectangle -> Bird rotation animation
 
-			 // step1: update floor
-			 moveFloor();
+			// step1: update floor
+			moveFloor();
 
-    	     if (GAME_START) {
-				 // Step1: update and render pipes
-				 movePipes();
-				 checkPipeScroll();
-				 updateScore();  // increment score if pass pipes
+    	    if (GAME_START) {
+				// Step1: update and render pipes
+				movePipes();
+				checkPipeScroll();
+				updateScore();  // increment score if pass pipes
 
-    	    	 // step2: update blob
-    	    	 moveBlob();
-    	    	 checkCollision();  // handle any collision events
-				 
+    	    	// step2: update blob
+    	    	moveBlob();
+    	    	checkCollision();  // handle any collision events
+				checkEggCollection();  // check if egg collected
+				
     	     }
     	 }
     	 
@@ -304,17 +329,34 @@ public class AngryFlappyBird extends Application {
 			blob.render(gc);
     	 }
 
-		 // update pipes
+		 // update pipes and any egg or pig on them
 		 private void movePipes() {
 			for (Pipe pipe : pipes) {
 				Sprite p = pipe.getPipe();
 				p.update(5);
 				p.render(gc);
 			}
+			if(eggSprite != null) {
+				eggSprite.update(5);
+				eggSprite.render(gc);
+			}
+			if(pigSprite != null) {
+				pigSprite.update(5);
+				pigSprite.render(gc);
+			}
 		}
-    	 
-    	 public void checkCollision() {
 
+		public void checkEggCollection() {
+			if(eggSprite != null && !OBSTACLE_COLLISION){ // if not already in collision
+				if(blob.intersectsSprite(eggSprite)) {
+					totalScore += DEF.EGG_POINTS;
+					updateScoreText(totalScore);
+					eggSprite = null;
+				}
+			}
+		}
+
+		public void checkCollision() {
 			// check collision with pipes
 			if(!OBSTACLE_COLLISION) {  // if not already in collision
 				for(Pipe p: pipes) {
@@ -338,7 +380,6 @@ public class AngryFlappyBird extends Application {
 					}
 				}
 			}
-
 			// check collision with floor
 			if(!OBSTACLE_COLLISION){
 				for(Sprite floor: floors) {
@@ -350,7 +391,6 @@ public class AngryFlappyBird extends Application {
 					}
 				}
 			}
-
 			// TODO: check collision with pigs (and eggs?)
 
 			// end the game when blob hit stuff
@@ -364,8 +404,7 @@ public class AngryFlappyBird extends Application {
 				}
 				timer.stop();
 			}
-			
-    	 }
+    	}
 
 		 private void endScroll() {
 			for (Pipe p: pipes) {
