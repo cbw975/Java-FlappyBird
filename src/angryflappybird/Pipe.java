@@ -6,12 +6,10 @@ public class Pipe {
     private double positionX = 400;  //TODO: adjust if necessary
     private double positionY;
     private double width = 60;
-    private double height;
 
     public Pipe(boolean isBottom,int height){
         this.pipe = new Sprite();
         String imgPath;
-        this.height = height;
         if(isBottom){
             imgPath = getClass().getResource("../resources/images/bottomPipe.png").toExternalForm();
             this.positionY = Defines.SCENE_HEIGHT - height;

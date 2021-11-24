@@ -5,9 +5,6 @@ import java.util.HashMap;
 import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 
 public class Defines {
@@ -16,7 +13,7 @@ public class Defines {
     final int APP_HEIGHT = 600;
     final int APP_WIDTH = 600;
     final static int SCENE_HEIGHT = 570;
-    final static int SCENE_WIDTH = 400;
+    final int SCENE_WIDTH = 400;
 
     // coefficients related to the blob
     final static int BLOB_WIDTH = 50;
@@ -25,16 +22,18 @@ public class Defines {
     final int BLOB_POS_Y = 200;
     final int BLOB_DROP_TIME = 300000000;  	// the elapsed time threshold before the blob starts dropping
     final int BLOB_DROP_VEL = 300;    		// the blob drop velocity
-    final int BLOB_FLY_VEL = -150;  // originally -40
+    final int BLOB_FLY_VEL = -125;			// originally -40
     final int BLOB_IMG_LEN = 4;
     final int BLOB_IMG_PERIOD = 5;
 
     // coefficients related to a pig
     final int PIG_POS_X = 400;              // same as positionX of Pipe
+    final int PIG_POS_Y = 20;				// same as positionX of Pipe
     final int PIG_WIDTH = 60;
-    final int PIG_HEIGHT = 50;
-    final int PIG_DROP_VEL = 100;    		// the pig drop velocity
-    final double PIG_PROB = 1.0;            // probability that a pig will spawn under pipe
+    final int PIG_HEIGHT = 45;
+    final double PIG_DROP_VEL = 0.1;    	// the pig drop velocity
+    final double PIG_PROB = 0.25;            // probability that a pig will spawn under pipe
+    final double PIG_EGG_POINTS = 5;       // points lost from pig collecting (white) egg
 
     // coefficients related to an egg
     final int EGG_POS_X = 400;              // same as positionX of Pipe
@@ -50,8 +49,8 @@ public class Defines {
     final int FLOOR_COUNT = 2;
 
     // coefficients related to a pipe
-    final int PIPE_HEIGHT_DO_SPACING = 350; // 425;  // larger value makes harder (smaller space b/w pipes)
-    final int PIPE_MAX_HEIGHT = 325; // 400;
+    final int PIPE_HEIGHT_DO_SPACING = 325; // 425;  // larger value makes harder (smaller space b/w pipes)
+    final int PIPE_MAX_HEIGHT = 300; // 400;
     final int PIPE_MIN_HEIGHT = 25;
     final double PIPE_SCROLL_VEL = -0.4;  // NOTE: set to be multiple of -0.2
     
@@ -105,7 +104,7 @@ public class Defines {
 		startButton = new Button("Go!");
 
         // initialize icon descriptions
-        textWhiteEgg = new Text("Bonus points"); // new Text(xCoord, yCoord, "Bonus points")
+        textWhiteEgg = new Text("Bonus points. Pigs can steal them!"); // new Text(xCoord, yCoord, "Bonus points")
         textPig = new Text("Avoid pigs");
         textBird = new Text("Control the bird's flight");
         textPipe = new Text("Avoid pipes by flying in between");

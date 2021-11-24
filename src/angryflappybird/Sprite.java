@@ -13,7 +13,6 @@ public class Sprite {
     private double velocityY;
     private double width;
     private double height;
-    private String IMAGE_DIR = "../resources/images/";
 
     public Sprite() {
         this.positionX = 0;

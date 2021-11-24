@@ -11,8 +11,6 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -24,7 +22,7 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 
 import java.util.ArrayList;
-import java.util.Random;
+//import java.util.Random;
 
 //The Application layer
 public class AngryFlappyBird extends Application {
@@ -40,7 +38,6 @@ public class AngryFlappyBird extends Application {
 	private Text livesLabel;  // displayed life count
 	private int totalScore = 0;  // score
 	private int lives = 3;  // lives remaining
-	// private Bird bird;
     private Sprite blob;
     private ArrayList<Sprite> pigs;
     private ArrayList<Sprite> eggs;
@@ -166,8 +163,6 @@ public class AngryFlappyBird extends Application {
         
         // initialize blob
         blob = new Sprite(DEF.BLOB_POS_X, DEF.BLOB_POS_Y, DEF.IMAGE.get("bird0"));
-		// bird = new Bird();
-		// blob = bird.getBird();
         blob.render(gc);
 
 		// initialize pipes
@@ -191,8 +186,8 @@ public class AngryFlappyBird extends Application {
 
 	// Pig stuff
 	private void setPig(int height) {
-		if(Math.random() < DEF.PIG_PROB){  // Check if egg spawns
-			Sprite p = new Sprite(DEF.PIG_POS_X, height + DEF.PIG_HEIGHT, DEF.IMAGE.get("pig"));
+		if(Math.random() < DEF.PIG_PROB){  // Check if pig spawns
+			Sprite p = new Sprite(DEF.PIG_POS_X, DEF.PIG_POS_Y, DEF.IMAGE.get("pig"));
 			p.setVelocity(DEF.PIPE_SCROLL_VEL, DEF.PIG_DROP_VEL);
         	p.render(gc);
 			pigs.add(p);
@@ -242,7 +237,7 @@ public class AngryFlappyBird extends Application {
             for (Pipe pipe : pipes) {
                 if (pipe.getPipe().getPositionX() == blob.getPositionX()) {
                     updateScoreText(++totalScore);  // increment score
-					// TODO: play audio!
+					// TODO: Audio clip of cleared pipe
                     break;
                 }
             }
@@ -258,8 +253,7 @@ public class AngryFlappyBird extends Application {
 			String lifeText = Integer.toString(--lives) + " lives left";
 			livesLabel.setText(lifeText);
 			timer.stop();
-			// begin playing again
-			resetGameScene(false);
+			resetGameScene(false);  // begin playing again
 		}
 	}
 
@@ -276,7 +270,6 @@ public class AngryFlappyBird extends Application {
     	     
     	    // clear current scene
     	    gc.clearRect(0, 0, DEF.SCENE_WIDTH, DEF.SCENE_HEIGHT);
-			// TODO: clear bird gc rectangle -> Bird rotation animation
 
 			// step1: update floor
 			moveFloor();
@@ -348,13 +341,25 @@ public class AngryFlappyBird extends Application {
 			}
 		}
 
-		public void checkEggCollection() {
-			// Check if an egg gets collected for bonus points
+		private void checkEggCollection() {
+			// check if pig collects egg for points loss
+			for(Sprite pig : pigs) {
+				for(Sprite e : eggs) {
+					if(pig.intersectsSprite(e)) {
+						totalScore -= DEF.PIG_EGG_POINTS;
+						updateScoreText(totalScore);
+						eggs.remove(e);
+						break;
+					}
+				}
+			}
+			// check if bird collects egg for bonus points
 			for(Sprite e : eggs) {
 				if(blob.intersectsSprite(e)) {
 					totalScore += DEF.EGG_POINTS;
 					updateScoreText(totalScore);
 					eggs.remove(e);
+					break;
 				}
 			}
 		}
@@ -368,35 +373,32 @@ public class AngryFlappyBird extends Application {
 						showHitEffect();  // collision animation
 						endScroll();
 						// TODO: audio clip of collision
-
-						// Bird flapping wings
-						// TODO: Animation of Bird falling immediately upon collision
-						flapTime += 0.18;
-                        if (flapTime > 0.5) {
-                            blob.addVelocity(-200, DEF.BLOB_DROP_VEL);
-                            blob.render(gc);
-                            blob.update(elapsedTime);
-                            flapTime = 0;
-                        }
+						birdCollapseEffect();  // Bird falling after collision
 						decLives();  // lose life
 						break;
 					}
 				}
 			}
 			// check collision with floor
-			if(!OBSTACLE_COLLISION){
-				for(Sprite floor : floors) {
-					if(blob.intersectsSprite(floor)){
-						OBSTACLE_COLLISION = true;
-						// TODO: audio clip of collision
-						GAME_OVER = true;
-						break;
-					}
+			for(Sprite floor : floors) {
+				if(blob.intersectsSprite(floor)){
+					OBSTACLE_COLLISION = true;
+					// TODO: audio clip of collision
+					GAME_OVER = true;
+					break;
 				}
 			}
-			// TODO: check collision with pigs (and eggs?)
+			// check collision with pigs
+			for(Sprite pig : pigs) {
+				if(blob.intersectsSprite(pig)) {
+					OBSTACLE_COLLISION = true;
+					// TODO: audio clip of pig collision
+					GAME_OVER = true;
+					break;
+				}
+			}
 
-			// end the game when blob hit stuff
+			// end the game when blob hits floor or pig
 			if (GAME_OVER) {
 				showHitEffect();
 				lives = 0;
@@ -422,17 +424,29 @@ public class AngryFlappyBird extends Application {
 			for (Sprite p : pigs) {
 				p.setVelocity(0, 0);
 			}
-		 }
-    	 
-	     private void showHitEffect() {
+		}
+		
+		private void birdCollapseEffect() {
+			// TODO: fix this
+			// Animation of bird bouncing back and dropping immediately (upon collision)
+			flapTime += 0.18;
+			if (flapTime > 0.5) {
+				blob.addVelocity(-200, DEF.BLOB_DROP_VEL);
+				blob.render(gc);
+				blob.update(elapsedTime);
+				flapTime = 0;
+			}
+		}
+		
+	    private void showHitEffect() {
 	        ParallelTransition parallelTransition = new ParallelTransition();
 	        FadeTransition fadeTransition = new FadeTransition(Duration.seconds(DEF.TRANSITION_TIME), gameScene);
 	        fadeTransition.setToValue(0);
 	        fadeTransition.setCycleCount(DEF.TRANSITION_CYCLE);
 	        fadeTransition.setAutoReverse(true);
 	        parallelTransition.getChildren().add(fadeTransition);
-	        parallelTransition.play();
-	     }
+	    	parallelTransition.play();
+	    }
     	 
     } // End of MyTimer class
 
