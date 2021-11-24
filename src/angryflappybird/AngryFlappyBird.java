@@ -87,7 +87,9 @@ public class AngryFlappyBird extends Application {
         DEF.startButton.setOnMouseClicked(this::mouseClickHandler);
         
         gameControl = new VBox();
-        gameControl.getChildren().addAll(DEF.startButton,DEF.IMVIEW.get("whiteEgg"),DEF.textWhiteEgg,DEF.IMVIEW.get("pig"),DEF.textPig);
+        gameControl.getChildren().addAll(DEF.startButton,DEF.IMVIEW.get("whiteEgg"),DEF.textWhiteEgg,
+										DEF.IMVIEW.get("pig"),DEF.textPig,DEF.IMVIEW.get("bird0"),DEF.textBird,
+										DEF.IMVIEW.get("topPipe"), DEF.textPipe);
     }
     
     private void mouseClickHandler(MouseEvent e) {

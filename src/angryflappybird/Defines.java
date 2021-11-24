@@ -20,7 +20,7 @@ public class Defines {
 
     // coefficients related to the blob
     final static int BLOB_WIDTH = 50;
-    final static int BLOB_HEIGHT = 50;
+    final static int BLOB_HEIGHT = 40;
     final int BLOB_POS_X = 70;
     final int BLOB_POS_Y = 200;
     final int BLOB_DROP_TIME = 300000000;  	// the elapsed time threshold before the blob starts dropping
@@ -35,8 +35,8 @@ public class Defines {
     final int PIG_DROP_VEL = 100;    		// the pig drop velocity
 
     // coefficients related to an egg
-    final int EGG_WIDTH = 80;
-    final int EGG_HEIGHT = 100;
+    final int EGG_WIDTH = 60;
+    final int EGG_HEIGHT = 70;
     
     // coefficients related to a floor
     final int FLOOR_WIDTH = 600;
@@ -60,14 +60,14 @@ public class Defines {
     // coefficients related to media display
     final String STAGE_TITLE = "Angry Flappy Bird";
 	private final String IMAGE_DIR = "../resources/images/";
-    final String[] IMAGE_FILES = {"background","bird0","bird1","bird2","bird3","floor","pig","whiteEgg"};
+    final String[] IMAGE_FILES = {"background","bird0","bird1","bird2","bird3","floor","pig","whiteEgg","topPipe"};
 
     final HashMap<String, ImageView> IMVIEW = new HashMap<String, ImageView>();
     final HashMap<String, Image> IMAGE = new HashMap<String, Image>();
     
     //nodes on the scene graph
     Button startButton;
-    Text textWhiteEgg, textPig;
+    Text textWhiteEgg, textPig, textBird, textPipe;
     
     // constructor
 	Defines() {
@@ -79,7 +79,7 @@ public class Defines {
 				img = new Image(pathImage(IMAGE_FILES[i]), FLOOR_WIDTH, FLOOR_HEIGHT, false, false);
 			} else if (i == 6) {  // pig
                 img = new Image(pathImage(IMAGE_FILES[i]), PIG_WIDTH, PIG_HEIGHT, false, false);
-            } else if (i == 7) {  // white egg
+            } else if (i == 7 || i == 8) {  // white egg
                 img = new Image(pathImage(IMAGE_FILES[i]), EGG_WIDTH, EGG_HEIGHT, false, false);
             } else if (i == 1 || i == 2 || i == 3 || i == 4){  // blob
 				img = new Image(pathImage(IMAGE_FILES[i]), BLOB_WIDTH, BLOB_HEIGHT, false, false);
@@ -101,6 +101,8 @@ public class Defines {
         // initialize icon descriptions
         textWhiteEgg = new Text("Bonus points"); // new Text(xCoord, yCoord, "Bonus points")
         textPig = new Text("Avoid pigs");
+        textBird = new Text("Control the bird's flight");
+        textPipe = new Text("Avoid pipes by flying in between");
 	}
 	
 	public String pathImage(String filepath) {
