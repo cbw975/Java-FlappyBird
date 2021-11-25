@@ -50,8 +50,8 @@ public class AngryFlappyBird extends Application {
     // scene graphs
     private Group gameScene;	 // the left half of the scene
     private VBox gameControl;	 // the right half of the GUI (control)
-    private GraphicsContext gc;		
-    
+    private GraphicsContext gc;
+
 	// the mandatory main method 
     public static void main(String[] args) {
         launch(args);
@@ -82,7 +82,6 @@ public class AngryFlappyBird extends Application {
     
     // the getContent method sets the Scene layer
     private void resetGameControl() {
-        
         DEF.startButton.setOnMouseClicked(this::mouseClickHandler);
         
         gameControl = new VBox();
@@ -94,7 +93,7 @@ public class AngryFlappyBird extends Application {
     private void mouseClickHandler(MouseEvent e) {
 		if(!OBSTACLE_COLLISION) {  // if not (already) colliding with obstacle
 			CLICKED = true;  // register click
-			// TODO: Audio clip of wing flap
+			DEF.AUDIO.get("flap").playAudio();
 			if(GAME_START) {  // Game in progress
 				clickTime = System.nanoTime(); 
 				blob.setVelocity(0, DEF.BLOB_FLY_VEL);
@@ -111,7 +110,7 @@ public class AngryFlappyBird extends Application {
     }
     
     private void resetGameScene(boolean firstEntry) {
-    	
+		DEF.AUDIO.get("gameStart").playAudio();
     	if(firstEntry) {
     		// create two canvases
             Canvas canvas = new Canvas(DEF.SCENE_WIDTH, DEF.SCENE_HEIGHT);
@@ -131,8 +130,6 @@ public class AngryFlappyBird extends Application {
 			livesLabel = new Text(10, 50, "3 lives left");
 			livesLabel.setFont(Font.font("Verdana", FontWeight.EXTRA_BOLD, 25));
 
-			// TODO: initialize sounds (?)
-            
             // create the game scene
             gameScene = new Group();
             gameScene.getChildren().addAll(background, canvas, scoreLabel, livesLabel);
@@ -237,7 +234,7 @@ public class AngryFlappyBird extends Application {
             for (Pipe pipe : pipes) {
                 if (pipe.getPipe().getPositionX() == blob.getPositionX()) {
                     updateScoreText(++totalScore);  // increment score
-					// TODO: Audio clip of cleared pipe
+					DEF.AUDIO.get("score").playAudio();
                     break;
                 }
             }
@@ -372,7 +369,7 @@ public class AngryFlappyBird extends Application {
 						OBSTACLE_COLLISION = true;
 						showHitEffect();  // collision animation
 						endScroll();
-						// TODO: audio clip of collision
+						DEF.AUDIO.get("collision").playAudio();
 						birdCollapseEffect();  // Bird falling after collision
 						decLives();  // lose life
 						break;
@@ -383,7 +380,7 @@ public class AngryFlappyBird extends Application {
 			for(Sprite floor : floors) {
 				if(blob.intersectsSprite(floor)){
 					OBSTACLE_COLLISION = true;
-					// TODO: audio clip of collision
+					DEF.AUDIO.get("collision").playAudio();
 					GAME_OVER = true;
 					break;
 				}
@@ -392,7 +389,7 @@ public class AngryFlappyBird extends Application {
 			for(Sprite pig : pigs) {
 				if(blob.intersectsSprite(pig)) {
 					OBSTACLE_COLLISION = true;
-					// TODO: audio clip of pig collision
+					DEF.AUDIO.get("collision").playAudio();
 					GAME_OVER = true;
 					break;
 				}
@@ -400,6 +397,7 @@ public class AngryFlappyBird extends Application {
 
 			// end the game when blob hits floor or pig
 			if (GAME_OVER) {
+				DEF.AUDIO.get("death").playAudio();
 				showHitEffect();
 				lives = 0;
 				decLives();  // update display

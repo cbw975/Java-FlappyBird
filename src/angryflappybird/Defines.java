@@ -65,10 +65,13 @@ public class Defines {
     // coefficients related to media display
     final String STAGE_TITLE = "Angry Flappy Bird";
 	private final String IMAGE_DIR = "../resources/images/";
+    private final String AUDIO_DIR = "../resources/sounds/";
     final String[] IMAGE_FILES = {"background","bird0","bird1","bird2","bird3","floor","pig","whiteEgg","topPipe"};
+    final String[] AUDIO_FILES = {"collision","death","score","flap","gameStart"};
 
     final HashMap<String, ImageView> IMVIEW = new HashMap<String, ImageView>();
     final HashMap<String, Image> IMAGE = new HashMap<String, Image>();
+    final HashMap<String, Audio> AUDIO = new HashMap<String, Audio>();
     
     //nodes on the scene graph
     Button startButton;
@@ -93,6 +96,12 @@ public class Defines {
 			}
     		IMAGE.put(IMAGE_FILES[i],img);
     	}
+
+        // initialize audio clips
+        for(int i=0; i<AUDIO_FILES.length; i++) {
+            Audio s = new Audio(AUDIO_DIR+AUDIO_FILES[i]+".mp3");
+            AUDIO.put(AUDIO_FILES[i],s);
+        }
 		
 		// initialize image views
 		for(int i=0; i<IMAGE_FILES.length; i++) {
