@@ -41,7 +41,6 @@ public class Defines {
     final int EGG_HEIGHT = 70;
     final double EGG_PROB = 0.4;            // probability that an egg will spawn on a pipe
     final int EGG_POINTS = 5;               // points gained from collecting a (white) egg
-    // final double EGG_GOLD_PROB = 0.25;      // probability that a spawned egg will be gold
     
     // coefficients related to a floor
     final int FLOOR_WIDTH = 600;
@@ -49,8 +48,8 @@ public class Defines {
     final int FLOOR_COUNT = 2;
 
     // coefficients related to a pipe
-    final int PIPE_HEIGHT_DO_SPACING = 325; // 425;  // larger value makes harder (smaller space b/w pipes)
-    final int PIPE_MAX_HEIGHT = 300; // 400;
+    final int PIPE_HEIGHT_DO_SPACING = 325; // larger value makes harder (smaller space b/w pipes)
+    final int PIPE_MAX_HEIGHT = 300;
     final int PIPE_MIN_HEIGHT = 25;
     final double PIPE_SCROLL_VEL = -0.4;  // NOTE: set to be multiple of -0.2
     
@@ -60,13 +59,13 @@ public class Defines {
     final double NANOSEC_TO_SEC = 1.0 / 1000000000.0;
     final double TRANSITION_TIME = 0.1;
     final int TRANSITION_CYCLE = 2;
-    
+    final int BACKGROUND_SHIFT_TIME = 750;  // Units in number of timer 'handle' loops
     
     // coefficients related to media display
     final String STAGE_TITLE = "Angry Flappy Bird";
 	private final String IMAGE_DIR = "../resources/images/";
     private final String AUDIO_DIR = "../resources/sounds/";
-    final String[] IMAGE_FILES = {"background","bird0","bird1","bird2","bird3","floor","pig","whiteEgg","topPipe"};
+    final String[] IMAGE_FILES = {"dayBackground","bird0","bird1","bird2","bird3","floor","pig","whiteEgg","topPipe","nightBackground"};
     final String[] AUDIO_FILES = {"collision","death","score","flap","gameStart"};
 
     final HashMap<String, ImageView> IMVIEW = new HashMap<String, ImageView>();
@@ -87,11 +86,11 @@ public class Defines {
 				img = new Image(pathImage(IMAGE_FILES[i]), FLOOR_WIDTH, FLOOR_HEIGHT, false, false);
 			} else if (i == 6) {  // pig
                 img = new Image(pathImage(IMAGE_FILES[i]), PIG_WIDTH, PIG_HEIGHT, false, false);
-            } else if (i == 7 || i == 8) {  // white egg
+            } else if (i == 7 || i == 8) {  // white egg and pipe
                 img = new Image(pathImage(IMAGE_FILES[i]), EGG_WIDTH, EGG_HEIGHT, false, false);
             } else if (i == 1 || i == 2 || i == 3 || i == 4){  // blob
 				img = new Image(pathImage(IMAGE_FILES[i]), BLOB_WIDTH, BLOB_HEIGHT, false, false);
-			} else {  // background
+			} else {  // backgrounds
 				img = new Image(pathImage(IMAGE_FILES[i]), SCENE_WIDTH, SCENE_HEIGHT, false, false);
 			}
     		IMAGE.put(IMAGE_FILES[i],img);

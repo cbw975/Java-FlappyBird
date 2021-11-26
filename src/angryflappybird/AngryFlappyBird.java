@@ -30,10 +30,11 @@ public class AngryFlappyBird extends Application {
 	private Defines DEF = new Defines();
     
     // time related attributes
-    private long clickTime, startTime, flapTime, elapsedTime;   
+    private long clickTime, startTime, flapTime, elapsedTime, backgroundTime;
     private AnimationTimer timer;
     
     // game components
+	private ImageView background;
 	private Text scoreLabel;  // displayed score
 	private Text livesLabel;  // displayed life count
 	private int totalScore = 0;  // score
@@ -46,6 +47,7 @@ public class AngryFlappyBird extends Application {
     
     // game flags
     private boolean CLICKED, GAME_START, GAME_OVER, OBSTACLE_COLLISION;
+	private int numPipesPassed = 0;
     
     // scene graphs
     private Group gameScene;	 // the left half of the scene
@@ -117,7 +119,7 @@ public class AngryFlappyBird extends Application {
             gc = canvas.getGraphicsContext2D();
 
             // create a background
-            ImageView background = DEF.IMVIEW.get("background");
+            background = new ImageView(DEF.IMAGE.get("dayBackground"));
 
 			// initialize labels - score, lives, etc.
 			scoreLabel = new Text(10, 20, "0");
@@ -167,6 +169,7 @@ public class AngryFlappyBird extends Application {
 
         // initialize timer
         startTime = System.nanoTime();
+		backgroundTime = 0;
         timer = new MyTimer();
         timer.start();
     }
@@ -235,6 +238,7 @@ public class AngryFlappyBird extends Application {
                 if (pipe.getPipe().getPositionX() == blob.getPositionX()) {
                     updateScoreText(++totalScore);  // increment score
 					DEF.AUDIO.get("score").playAudio();
+					numPipesPassed++;
                     break;
                 }
             }
@@ -251,6 +255,19 @@ public class AngryFlappyBird extends Application {
 			livesLabel.setText(lifeText);
 			timer.stop();
 			resetGameScene(false);  // begin playing again
+		}
+	}
+
+	// Switches the background image, between night and day
+	private void checkBackground() {
+		backgroundTime += 1;
+		if(backgroundTime > DEF.BACKGROUND_SHIFT_TIME) {
+			if(background.getImage() == DEF.IMAGE.get("dayBackground")) {
+				background.setImage(DEF.IMAGE.get("nightBackground"));
+			} else {
+				background.setImage(DEF.IMAGE.get("dayBackground"));
+			}
+			backgroundTime = 0;
 		}
 	}
 
@@ -277,11 +294,11 @@ public class AngryFlappyBird extends Application {
 				checkPipeScroll();
 				checkEggCollection();  // check if egg collected
 				updateScore();  // increment score if pass pipes
+				checkBackground();  // changes background periodically
 
     	    	// step2: update blob
     	    	moveBlob();
     	    	checkCollision();  // handle any collision events
-				
     	     }
     	 }
     	 
