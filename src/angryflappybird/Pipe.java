@@ -1,13 +1,22 @@
 package angryflappybird;
 
+/**
+ * Manages the properties and methods of each pipe in the game.
+ */
 public class Pipe {
     
     private Sprite pipe;
-    private double positionX = 400;  //TODO: adjust if necessary
+    private double positionX = 400;
     private double positionY;
     private double width = 60;
 
-    public Pipe(boolean isBottom,int height){
+    /**
+     * Creates a pipe.
+
+     * @param isBottom specifies a bottom pipe vs top pipe in a set
+     * @param height height of bottom pipe (gives corresponding pipes' heights)
+     */
+    public Pipe(boolean isBottom,int height) {
         this.pipe = new Sprite();
         String imgPath;
         if(isBottom){
@@ -21,7 +30,12 @@ public class Pipe {
         this.pipe.setPositionXY(positionX, positionY);
     }
 
-    public Sprite getPipe(){
+    /**
+     * Returns the Sprite corresponding to a pipe
+
+     * @return Sprite representing pipe
+     */
+    public Sprite getPipe() {
         return pipe;
     }
     

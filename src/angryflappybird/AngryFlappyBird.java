@@ -20,46 +20,56 @@ import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.util.Duration;
-
 import java.util.ArrayList;
-//import java.util.Random;
 
 //The Application layer
+/**
+ * Launches the application, prepares the application scene and implements the animation of the
+ * objects on the scene.
+ */
 public class AngryFlappyBird extends Application {
-	
+
 	private Defines DEF = new Defines();
     
-    // time related attributes
-    private long clickTime, startTime, flapTime, elapsedTime, backgroundTime;
-    private AnimationTimer timer;
+    // time related attributes of the game
+	private long clickTime;
+    private long startTime;
+    private long flapTime;
+    private long elapsedTime;
+    private long backgroundTime;
+    private AnimationTimer timer;  // to animate the game components
     
     // game components
 	private ImageView background;
-	private Text scoreLabel;  // displayed score
-	private Text livesLabel;  // displayed life count
-	private int totalScore = 0;  // score
-	private int lives = 3;  // lives remaining
-    private Sprite blob;
+	private Text scoreLabel;			// displayed score
+	private Text livesLabel;			// displayed life count
+	private int totalScore = 0;			// score
+	private int lives = 3;				// lives remaining
+	private Sprite blob;				// Main character of the game (user controlled)
     private ArrayList<Sprite> pigs;
     private ArrayList<Sprite> eggs;
-    private ArrayList<Sprite> floors;
+    private ArrayList<Sprite> floors;	// Floor of the game
 	private ArrayList<Pipe> pipes;
     
-    // game flags
+    // Flags to keep track of game phase + status
     private boolean CLICKED, GAME_START, GAME_OVER, OBSTACLE_COLLISION;
-	private int numPipesPassed = 0;
     
     // scene graphs
     private Group gameScene;	 // the left half of the scene
     private VBox gameControl;	 // the right half of the GUI (control)
-    private GraphicsContext gc;
+    private GraphicsContext gc;  // placeholder for a canvas
 
-	// the mandatory main method 
+	// the mandatory main method - launches the application
     public static void main(String[] args) {
         launch(args);
     }
-       
-    // the start method sets the Stage layer
+    
+	/**
+	 * Sets the stage layer
+
+	 * @param primaryStage to set the layer
+	 * @throws Exception
+	 */
     @Override
     public void start(Stage primaryStage) throws Exception {
     	
@@ -82,16 +92,23 @@ public class AngryFlappyBird extends Application {
         primaryStage.show();
     }
     
-    // the getContent method sets the Scene layer
+	/**
+	 * Resets the gameControl scene that holds the button.
+	 * the getContent method sets the Scene layer
+	 */
     private void resetGameControl() {
         DEF.startButton.setOnMouseClicked(this::mouseClickHandler);
         
         gameControl = new VBox();
-        gameControl.getChildren().addAll(DEF.startButton,DEF.IMVIEW.get("whiteEgg"),DEF.textWhiteEgg,
-										DEF.IMVIEW.get("pig"),DEF.textPig,DEF.IMVIEW.get("bird0"),DEF.textBird,
-										DEF.IMVIEW.get("topPipe"), DEF.textPipe);
+        gameControl.getChildren().addAll(DEF.startButton, DEF.IMVIEW.get("whiteEgg"),
+        		DEF.textWhiteEgg, DEF.IMVIEW.get("pig"), DEF.textPig,
+        		DEF.IMVIEW.get("bird0"), DEF.textBird, 
+        		DEF.IMVIEW.get("topPipe"), DEF.textPipe);
     }
     
+	/**
+	 * Handles the effect of click on startButton.
+	 */
     private void mouseClickHandler(MouseEvent e) {
 		if(!OBSTACLE_COLLISION) {  // if not (already) colliding with obstacle
 			CLICKED = true;  // register click
@@ -102,7 +119,7 @@ public class AngryFlappyBird extends Application {
 			} else {  // Start game if not yet started
 				GAME_START = true;
 			}
-		} else {  // collision occured --> lose a life (restart playing if not gameover)
+		} else {  // collision occurred --> lose a life (restart playing if not gameover)
 			decLives();
 		}
 		
@@ -111,6 +128,13 @@ public class AngryFlappyBird extends Application {
         }
     }
     
+	/**
+	 * Resets the gameScene differently based on whether the
+	 * game is entered anew or after a lost life. Resets all
+	 * flags + game params, including visuals (blob, floor)
+
+	 * @param firstEntry determines whether this is a new game
+	 */
     private void resetGameScene(boolean firstEntry) {
 		DEF.AUDIO.get("gameStart").playAudio();
     	if(firstEntry) {
@@ -174,7 +198,11 @@ public class AngryFlappyBird extends Application {
         timer.start();
     }
 
-	// Egg stuff
+	/**
+	 * Sets an egg to appear on a (next) set of pipes, with chance specified.
+
+	 * @param height of (bottom) pipe for egg to appear on top of
+	 */
 	private void setEgg(int height) {
 		if(Math.random() < DEF.EGG_PROB){  // Check if egg spawns
 			Sprite e = new Sprite(DEF.EGG_POS_X, height - DEF.EGG_HEIGHT, DEF.IMAGE.get("whiteEgg"));
@@ -184,8 +212,11 @@ public class AngryFlappyBird extends Application {
 		}
 	}
 
-	// Pig stuff
-	private void setPig(int height) {
+	/**
+	 * Sets a pig to appear (falling down from top of screen) with a (next) set of pipes, with
+	 * chance specified.
+	 */
+	private void setPig() {
 		if(Math.random() < DEF.PIG_PROB){  // Check if pig spawns
 			Sprite p = new Sprite(DEF.PIG_POS_X, DEF.PIG_POS_Y, DEF.IMAGE.get("pig"));
 			p.setVelocity(DEF.PIPE_SCROLL_VEL, DEF.PIG_DROP_VEL);
@@ -194,11 +225,17 @@ public class AngryFlappyBird extends Application {
 		}
 	}
 
-	// Pipe stuff
+	/**
+	 * Generates a random height value for a bottom pipe, within range from DEF
+	 * @return random height value for bottom pipe, in range [PIPE_MAX_HEIGHT,PIPE_MIN_HEIGHT)
+	 */
 	private int getRandomPipeHeight() {
         return (int) (Math.random() * (DEF.PIPE_MAX_HEIGHT - DEF.PIPE_MIN_HEIGHT)) + DEF.PIPE_MIN_HEIGHT;
     }
 	
+	/**
+	 * Generates a set of pipes (one top, one bottom) to next appear on screen
+	 */
 	private void setPipes() {
 		int height = getRandomPipeHeight();  // bottom pipe height
 		Pipe botPipe = new Pipe(true, height);
@@ -210,12 +247,15 @@ public class AngryFlappyBird extends Application {
         botPipe.getPipe().render(gc);
 		setEgg(DEF.SCENE_HEIGHT - height);
         topPipe.getPipe().render(gc);
-		setPig(DEF.PIPE_HEIGHT_DO_SPACING - height);
+		setPig();
 
         pipes.add(botPipe);
         pipes.add(topPipe);
 	}
 	
+	/**
+	 * Ensure old and new pipes scroll off and on the screen
+	 */
 	private void checkPipeScroll() {
 		if (pipes.size() > 0) {
             Sprite p = pipes.get(pipes.size() - 1).getPipe();
@@ -228,24 +268,33 @@ public class AngryFlappyBird extends Application {
         }
     }
 
+	/**
+	 * Updates the displayed score Text on the game scene
+
+	 * @param score to display
+	 */
 	private void updateScoreText(int score) {
         scoreLabel.setText(Integer.toString(score));
     }
 
+	/**
+	 * Updates/Increments the total score if/when a set of pipes is cleared
+	 */
 	private void updateScore() {
 		if (!OBSTACLE_COLLISION) {  // if passed pipes w/o collision
             for (Pipe pipe : pipes) {
                 if (pipe.getPipe().getPositionX() == blob.getPositionX()) {
                     updateScoreText(++totalScore);  // increment score
 					DEF.AUDIO.get("score").playAudio();
-					numPipesPassed++;
                     break;
                 }
             }
         }
 	}
 
-	// decrement life count, game over if reached 0 lives
+	/**
+	 * Decrement the life count, and set gameover if 0 lives reached
+	 */
 	private void decLives() {
 		if(lives <= 1){
 			livesLabel.setText("0 lives left");
@@ -258,7 +307,9 @@ public class AngryFlappyBird extends Application {
 		}
 	}
 
-	// Switches the background image, between night and day
+	/**
+	 * Cycles through night/day background images, every specific number of game loop iterations
+	 */
 	private void checkBackground() {
 		backgroundTime += 1;
 		if(backgroundTime > DEF.BACKGROUND_SHIFT_TIME) {
@@ -271,7 +322,9 @@ public class AngryFlappyBird extends Application {
 		}
 	}
 
-    //timer stuff
+	/**
+	 * Custom timer class that implements the behavior of the AngryFlappyBird application
+	 */
     class MyTimer extends AnimationTimer {
     	
     	int counter = 0;
@@ -302,7 +355,10 @@ public class AngryFlappyBird extends Application {
     	     }
     	 }
     	 
-    	 // step1: update floor
+		 /**
+		  * (Step 1) Updates the floor by placing them one after the other by setting their
+		  * new positions and rendering them on the canvas
+		  */
     	 private void moveFloor() {
     		
     		for(int i=0; i<DEF.FLOOR_COUNT; i++) {
@@ -316,7 +372,9 @@ public class AngryFlappyBird extends Application {
     		}
     	 }
     	 
-    	 // step2: update blob
+		 /**
+		  * (Step 2) Updates the blob/bird after some elapsed duration of time
+		  */
     	 private void moveBlob() {
     		 
 			long diffTime = System.nanoTime() - clickTime;
@@ -338,7 +396,10 @@ public class AngryFlappyBird extends Application {
 			blob.render(gc);
     	 }
 
-		 // update pipes and any egg or pig on them
+		 /**
+		  * Updates the pipes after some elapsed duration of time, along with any egg(s) or
+		  * pig(s) with them.
+		  */
 		 private void movePipes() {
 			for (Pipe pipe : pipes) {
 				Sprite p = pipe.getPipe();
@@ -354,7 +415,11 @@ public class AngryFlappyBird extends Application {
 				p.render(gc);
 			}
 		}
-
+		
+		/**
+		 * Checks if there is a collision/collection b/w the pig(s) or blob/bird and an egg,
+		 * and updates the score accordingly
+		 */
 		private void checkEggCollection() {
 			// check if pig collects egg for points loss
 			for(Sprite pig : pigs) {
@@ -378,6 +443,10 @@ public class AngryFlappyBird extends Application {
 			}
 		}
 
+		/**
+		 * Checks if there is a collision between the blob and any obstacles (pig, floor,
+		 * pipe) and sets the OBSTACLE_COLLISION and GAME_OVER flags accordingly
+		 */
 		public void checkCollision() {
 			// check collision with pipes
 			if(!OBSTACLE_COLLISION) {  // if not already in collision
@@ -426,7 +495,10 @@ public class AngryFlappyBird extends Application {
 			}
     	}
 
-		 private void endScroll() {
+		/**
+		 * Have all (moving) components of the game scene stop
+		 */
+		private void endScroll() {
 			for (Pipe p : pipes) {
 				p.getPipe().setVelocity(0, 0);
 			}
@@ -441,6 +513,9 @@ public class AngryFlappyBird extends Application {
 			}
 		}
 		
+		/**
+		 * Plays out the bird falling after a collision with pig or pipe
+		 */
 		private void birdCollapseEffect() {
 			// TODO: fix this
 			// Animation of bird bouncing back and dropping immediately (upon collision)
@@ -453,6 +528,9 @@ public class AngryFlappyBird extends Application {
 			}
 		}
 		
+		/**
+		 * Creates + plays a parallel transition to show the effect when hitting an obstacle
+		 */
 	    private void showHitEffect() {
 	        ParallelTransition parallelTransition = new ParallelTransition();
 	        FadeTransition fadeTransition = new FadeTransition(Duration.seconds(DEF.TRANSITION_TIME), gameScene);

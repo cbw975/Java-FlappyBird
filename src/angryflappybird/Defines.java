@@ -7,6 +7,9 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.text.Text;
 
+/**
+ * Manages all the dimensions, coefficients and parameters of the application and its components.
+ */
 public class Defines {
     
 	// dimension of the GUI application
@@ -20,7 +23,7 @@ public class Defines {
     final static int BLOB_HEIGHT = 40;
     final int BLOB_POS_X = 70;
     final int BLOB_POS_Y = 200;
-    final int BLOB_DROP_TIME = 300000000;  	// the elapsed time threshold before the blob starts dropping
+    final int BLOB_DROP_TIME = 300000000;  	// elapsed time threshold before blob starts to drop
     final int BLOB_DROP_VEL = 300;    		// the blob drop velocity
     final int BLOB_FLY_VEL = -125;			// originally -40
     final int BLOB_IMG_LEN = 4;
@@ -76,7 +79,9 @@ public class Defines {
     Button startButton;
     Text textWhiteEgg, textPig, textBird, textPipe;
     
-    // constructor
+    /**
+     * Constructor. Initializes instance variables and scene graph nodes.
+     */
 	Defines() {
 		
 		// initialize images
@@ -112,17 +117,31 @@ public class Defines {
 		startButton = new Button("Go!");
 
         // initialize icon descriptions
-        textWhiteEgg = new Text("Bonus points. Pigs can steal them!"); // new Text(xCoord, yCoord, "Bonus points")
+        textWhiteEgg = new Text("Bonus points. Pigs can steal them!");
         textPig = new Text("Avoid pigs");
         textBird = new Text("Control the bird's flight");
         textPipe = new Text("Avoid pipes by flying in between");
 	}
 	
+    /**
+     * Based on the name of the image file, creates a full file path.
+
+     * @param filepath relative/shorthand filename
+     * @return the full file path
+     */
 	public String pathImage(String filepath) {
     	String fullpath = getClass().getResource(IMAGE_DIR+filepath+".png").toExternalForm();
     	return fullpath;
     }
 	
+    /**
+     * Creates a resized image and adds it to the IMAGE map variable.
+
+     * @param filepath of image
+     * @param width of image
+     * @param height of image
+     * @return resized Image
+     */
 	public Image resizeImage(String filepath, int width, int height) {
     	IMAGE.put(filepath, new Image(pathImage(filepath), width, height, false, false));
     	return IMAGE.get(filepath);
